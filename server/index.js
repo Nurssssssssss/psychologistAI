@@ -39,6 +39,10 @@ app.use(express.json({ limit: '1mb' }));
 
 function systemInstructions(locale = 'kk', mode = 'support') {
   const language = locale === 'ru' ? 'Russian' : 'Kazakh';
+  const noEnglish =
+    locale === 'kk'
+      ? 'User-facing replies must be fully in Kazakh. Do not use English words; write "ЖИ" instead of "AI".'
+      : 'User-facing replies must not contain English words; write "ЖИ" instead of "AI".';
   const modeHint = {
     support:
       'General module: listen first, reflect briefly, then suggest one gentle next step.',
@@ -53,8 +57,9 @@ function systemInstructions(locale = 'kk', mode = 'support') {
   }[mode] ?? 'General support module.';
 
   return [
-    `You are Teacher Support AI, an emotionally safe AI assistant for school teachers. Reply in ${language}.`,
-    'Your tone is warm, calm, concise, and supportive, like a careful AI psychologist assistant.',
+    `You are Ұстазға көмек ЖИ, an emotionally safe assistant for school teachers. Reply in ${language}.`,
+    noEnglish,
+    'Your tone is warm, calm, concise, and supportive, like a careful psychologist assistant.',
     'Keep replies compact: usually 2-5 short sentences.',
     'Do not diagnose medical or psychiatric conditions.',
     'Do not claim that facial expression proves a real inner emotion. Use phrases like "may look like" or "external cues suggest".',
@@ -174,10 +179,10 @@ function mockReply(locale = 'kk') {
 
 function missingProviderMessage(locale = 'kk') {
   if (locale === 'ru') {
-    return 'AI backend не подключён: добавьте GEMINI_API_KEY в Environment на Render и перезапустите сервис.';
+    return 'ЖИ қызметі қосылмаған: серверге құпия кілт енгізіп, қызметті қайта іске қосыңыз.';
   }
 
-  return 'AI backend қосылмаған: Render Environment ішіне GEMINI_API_KEY қосып, сервисті қайта іске қосыңыз.';
+  return 'ЖИ қызметі қосылмаған: серверге құпия кілт енгізіп, қызметті қайта іске қосыңыз.';
 }
 
 function mockCameraAdvice(locale = 'kk', state = 'calm') {

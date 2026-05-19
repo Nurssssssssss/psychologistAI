@@ -12,7 +12,7 @@ export default function ChatPanel({ messages, input, setInput, onSend, busy = fa
   }, [messages, busy]);
 
   return (
-    <div className="flex h-full min-h-[360px] flex-col rounded-[1.55rem] border border-white/12 bg-white/7 p-4 backdrop-blur-xl sm:min-h-[520px]">
+    <div className="relative z-10 flex min-h-[440px] flex-col rounded-[1.55rem] border border-ink/12 bg-ink/24 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.06)] backdrop-blur-xl sm:min-h-[520px]">
       <div className="flex-1 space-y-4 overflow-y-auto pr-1">
         <AnimatePresence initial={false}>
           {messages.map((message, index) => {
@@ -34,14 +34,14 @@ export default function ChatPanel({ messages, input, setInput, onSend, busy = fa
                   className={[
                     'max-w-[82%] rounded-[1.2rem] px-4 py-3 text-sm leading-7',
                     isUser
-                      ? 'bg-white text-ink shadow-calm'
-                      : 'border border-white/12 bg-ink/42 text-cloud/78',
+                      ? 'bg-white text-ink shadow-[0_18px_44px_rgba(85,221,224,.18)]'
+                      : 'border border-ink/12 bg-ink/8 text-cloud/86 shadow-[0_18px_44px_rgba(0,0,0,.15)]',
                   ].join(' ')}
                 >
                   {message.content}
                 </div>
                 {isUser ? (
-                  <span className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/18 bg-white/10 text-white">
+                  <span className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink/18 bg-ink/10 text-white">
                     <UserRound size={18} />
                   </span>
                 ) : null}

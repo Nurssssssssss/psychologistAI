@@ -3,6 +3,7 @@ import { CalendarDays, Plus, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import MiniChart from '../components/shared/MiniChart.jsx';
 import PageTransition from '../components/shared/PageTransition.jsx';
+import PremiumCard from '../components/shared/PremiumCard.jsx';
 import SectionHeader from '../components/shared/SectionHeader.jsx';
 import StatusPill from '../components/shared/StatusPill.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -39,7 +40,7 @@ export default function EmotionDiary() {
 
   return (
     <PageTransition className="diary-calm-page space-y-8">
-      <SectionHeader eyebrow="Emotion diary" title={t('diary.title')}>
+      <SectionHeader eyebrow="Эмоция күнделігі" title={t('diary.title')}>
         <p>
           {t('diary.subtitle')}.{' '}
           {language === 'kk'
@@ -49,13 +50,13 @@ export default function EmotionDiary() {
       </SectionHeader>
 
       <div className="grid gap-6 xl:grid-cols-[.92fr_1.08fr]">
-        <div className="calm-panel rounded-[1.75rem] p-5 sm:p-6">
-          <div className="mb-5 flex items-center justify-between gap-4">
+        <PremiumCard tone="soft" className="rounded-[1.9rem] p-5 sm:p-6">
+          <div className="relative z-10 mb-5 flex items-center justify-between gap-4">
             <StatusPill color="sage">{t('diary.emotion')}</StatusPill>
             <CalendarDays className="text-aqua" size={22} />
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="relative z-10 grid gap-3 sm:grid-cols-2">
             {diaryEmotions.map((emotion) => (
               <button
                 key={emotion.key}
@@ -65,7 +66,7 @@ export default function EmotionDiary() {
                   'calm-tile rounded-[1.15rem] p-4 text-left focus-ring',
                   selectedEmotion === emotion.key
                     ? 'border-aqua/42 bg-aqua/12 shadow-calm'
-                    : 'hover:bg-white/10',
+                    : 'hover:bg-ink/10',
                 ].join(' ')}
               >
                 <span className="mb-3 block h-2 w-10 rounded-full" style={{ background: emotion.color }} />
@@ -74,7 +75,22 @@ export default function EmotionDiary() {
             ))}
           </div>
 
-          <label className="mt-6 block">
+          <div
+            className="diary-memory-field relative z-10 mt-5 p-5"
+            style={{ '--emotion-color': currentEmotion.color }}
+          >
+            <div className="relative z-10 flex h-full min-h-28 flex-col justify-end">
+              <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-cloud/66">естелік белгісі</p>
+              <p className="mt-2 font-display text-3xl font-extrabold text-white">{currentEmotion.label}</p>
+            </div>
+            <span className="absolute right-6 top-6 h-3 w-3 rounded-full bg-white shadow-[0_0_28px_rgba(255,255,255,.65)]" />
+            <span
+              className="absolute bottom-8 right-16 h-5 w-5 rounded-full"
+              style={{ background: currentEmotion.color, boxShadow: `0 0 36px ${currentEmotion.color}` }}
+            />
+          </div>
+
+          <label className="relative z-10 mt-6 block">
             <span className="mb-2 block text-sm font-bold text-cloud/76">{t('diary.note')}</span>
             <textarea
               className="soft-input min-h-[136px] resize-none px-4 py-3 leading-7"
@@ -84,20 +100,20 @@ export default function EmotionDiary() {
             />
           </label>
 
-          <button type="button" onClick={saveEntry} className="premium-button mt-5 w-full focus-ring">
+          <button type="button" onClick={saveEntry} className="relative z-10 mt-5 w-full premium-button focus-ring">
             <Plus size={19} />
             {t('actions.save')}
           </button>
-        </div>
+        </PremiumCard>
 
         <div className="space-y-6">
-          <div className="calm-panel rounded-[1.75rem] p-5 sm:p-6">
+          <PremiumCard className="rounded-[1.9rem] p-5 sm:p-6">
             <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.24em] text-aqua/76">{t('diary.analytics')}</p>
-                <h2 className="mt-2 font-display text-2xl font-extrabold text-white">{average}% balance</h2>
+                <h2 className="mt-2 font-display text-2xl font-extrabold text-white">{average}% тепе-теңдік</h2>
               </div>
-              <div className="flex rounded-full border border-white/12 bg-white/8 p-1 text-sm font-bold text-cloud/58">
+              <div className="flex rounded-full border border-ink/12 bg-ink/8 p-1 text-sm font-bold text-cloud/76">
                 {[
                   ['week', t('diary.week')],
                   ['month', t('diary.month')],
@@ -108,7 +124,7 @@ export default function EmotionDiary() {
                     onClick={() => setRange(key)}
                     className={[
                       'rounded-full px-4 py-2 transition focus-ring',
-                      range === key ? 'bg-white text-ink' : 'hover:bg-white/10 hover:text-white',
+                      range === key ? 'bg-white text-ink' : 'hover:bg-ink/10 hover:text-white',
                     ].join(' ')}
                   >
                     {label}
@@ -116,7 +132,9 @@ export default function EmotionDiary() {
                 ))}
               </div>
             </div>
-            <MiniChart data={chartData} />
+            <div className="relative z-10">
+              <MiniChart data={chartData} />
+            </div>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               {[
                 ['Жақсарған күндер', '5'],
@@ -125,13 +143,13 @@ export default function EmotionDiary() {
               ].map(([label, value]) => (
                 <div key={label} className="calm-tile rounded-2xl p-4">
                   <p className="text-2xl font-extrabold text-white">{value}</p>
-                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-cloud/42">{label}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-cloud/66">{label}</p>
                 </div>
               ))}
             </div>
-          </div>
+          </PremiumCard>
 
-          <div className="calm-panel rounded-[1.65rem] p-5">
+          <PremiumCard tone="quiet" className="rounded-[1.65rem] p-5">
             <div className="mb-4 flex items-center justify-between gap-4">
               <h2 className="font-display text-xl font-extrabold text-white">{t('diary.timeline')}</h2>
               <TrendingUp className="text-aqua" size={21} />
@@ -144,21 +162,21 @@ export default function EmotionDiary() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 10 }}
-                    className="rounded-[1.1rem] border border-white/10 bg-white/7 p-4"
+                    className="rounded-[1.1rem] border border-ink/10 bg-ink/7 p-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <span className="h-3 w-3 rounded-full" style={{ background: entry.color }} />
                         <strong className="text-white">{entry.mood}</strong>
                       </div>
-                      <span className="text-xs font-bold uppercase tracking-[0.18em] text-cloud/38">{entry.date}</span>
+                      <span className="text-xs font-bold uppercase tracking-[0.18em] text-cloud/62">{entry.date}</span>
                     </div>
-                    <p className="mt-3 text-sm leading-7 text-cloud/62">{entry.note}</p>
+                    <p className="mt-3 text-sm leading-7 text-cloud/78">{entry.note}</p>
                   </motion.article>
                 ))}
               </AnimatePresence>
             </div>
-          </div>
+          </PremiumCard>
         </div>
       </div>
     </PageTransition>

@@ -3,12 +3,12 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 function buildErrorReply(locale = 'kk', detail = '') {
   const content =
     locale === 'ru'
-      ? 'AI backend сейчас не отвечает. Проверьте, что Render запущен как Node Web Service и что в Environment добавлен GEMINI_API_KEY.'
-      : 'AI backend қазір жауап бермей тұр. Render Node Web Service болып іске қосылғанын және Environment ішінде GEMINI_API_KEY бар екенін тексеріңіз.';
+      ? 'ЖИ қызметі қазір жауап бермей тұр. Сервер іске қосылғанын және құпия кілт енгізілгенін тексеріңіз.'
+      : 'ЖИ қызметі қазір жауап бермей тұр. Сервер іске қосылғанын және құпия кілт енгізілгенін тексеріңіз.';
 
   return {
     role: 'ai',
-    content: detail ? `${content} (${detail})` : content,
+    content: detail ? `${content}` : content,
     source: 'error',
   };
 }
@@ -16,7 +16,7 @@ function buildErrorReply(locale = 'kk', detail = '') {
 export async function sendChatMessage({ message, history = [], locale = 'kk', mode = 'support' }) {
   const trimmedMessage = message.trim();
   if (!trimmedMessage) {
-    return buildErrorReply(locale, 'empty message');
+    return buildErrorReply(locale);
   }
 
   try {
@@ -32,18 +32,18 @@ export async function sendChatMessage({ message, history = [], locale = 'kk', mo
     });
 
     if (!response.ok) {
-      throw new Error(`AI backend returned ${response.status}`);
+      throw new Error(`service returned ${response.status}`);
     }
 
     const data = await response.json();
     const content = data.message ?? data.content ?? '';
 
     if (data.source === 'mock-backend') {
-      throw new Error('AI provider is not configured');
+      throw new Error('provider is not configured');
     }
 
     if (!content.trim()) {
-      throw new Error('AI backend returned an empty message');
+      throw new Error('empty message');
     }
 
     return {
@@ -52,7 +52,7 @@ export async function sendChatMessage({ message, history = [], locale = 'kk', mo
       source: data.source ?? 'backend',
     };
   } catch (error) {
-    console.info('AI backend error:', error.message);
+    console.info('AI service error:', error.message);
     return buildErrorReply(locale, error.message);
   }
 }
@@ -102,7 +102,7 @@ export async function requestCameraAdvice({ signals, locale = 'kk', context = ''
     });
 
     if (!response.ok) {
-      throw new Error(`Camera AI returned ${response.status}`);
+      throw new Error(`camera service returned ${response.status}`);
     }
 
     const data = await response.json();
@@ -124,7 +124,7 @@ export async function transcribeAudio(audioBlob, locale = 'kk') {
   });
 
   if (!response.ok) {
-    throw new Error(`Speech backend returned ${response.status}`);
+    throw new Error(`speech service returned ${response.status}`);
   }
 
   return response.json();

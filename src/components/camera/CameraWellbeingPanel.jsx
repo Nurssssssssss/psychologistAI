@@ -72,10 +72,10 @@ export default function CameraWellbeingPanel({
   }, [camera.active, camera.signals, face.detected, face.moodKey, onMoodDetected, onSignalsChange]);
 
   return (
-    <section className="glass-panel rounded-[1.75rem] p-4 sm:p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <section className="premium-card rounded-[1.9rem] p-4 sm:p-5">
+      <div className="relative z-10 mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-aqua/78">Camera AI</p>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-aqua/78">Камера ЖИ</p>
           <h2 className="mt-2 font-display text-xl font-extrabold text-white sm:text-2xl">
             {language === 'ru' ? 'Скан состояния' : 'Күйді камерамен оқу'}
           </h2>
@@ -113,8 +113,8 @@ export default function CameraWellbeingPanel({
         </button>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.05fr_.95fr]">
-        <div className="relative min-h-[250px] overflow-hidden rounded-[1.25rem] border border-white/12 bg-ink/48">
+      <div className="relative z-10 grid gap-4 xl:grid-cols-[1.05fr_.95fr]">
+        <div className="relative min-h-[250px] overflow-hidden rounded-[1.25rem] border border-ink/12 bg-ink/48">
           <video
             ref={camera.videoRef}
             className={[
@@ -129,7 +129,7 @@ export default function CameraWellbeingPanel({
             <div className="absolute inset-0 grid place-items-center px-6 text-center">
               <div>
                 <ScanFace className="mx-auto text-aqua" size={36} />
-                <p className="mt-4 text-sm leading-7 text-cloud/62">
+                <p className="mt-4 text-sm leading-7 text-cloud/78">
                   {camera.supported
                     ? copy.waiting[1]
                     : language === 'ru'
@@ -151,13 +151,13 @@ export default function CameraWellbeingPanel({
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-[1.25rem] border border-white/12 bg-white/7 p-4">
+        <div className="flex flex-col justify-between rounded-[1.25rem] border border-ink/12 bg-ink/7 p-4">
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-aqua/18 bg-aqua/12 text-aqua">
                 <ShieldCheck size={21} />
               </span>
-              <p className="text-sm leading-7 text-cloud/68">
+              <p className="text-sm leading-7 text-cloud/82">
                 {aiAdvice || faceAdvice}
               </p>
             </div>
@@ -168,12 +168,12 @@ export default function CameraWellbeingPanel({
                 [language === 'ru' ? 'Улыбка' : 'Жымию', metricPercent(face.smile), face.smile],
                 [language === 'ru' ? 'Напряжение' : 'Кернеу', metricPercent(face.tension), face.tension],
               ].map(([label, value, percent]) => (
-                <div key={label} className="rounded-2xl border border-white/10 bg-ink/28 p-3">
+                <div key={label} className="rounded-2xl border border-ink/10 bg-ink/28 p-3">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-bold uppercase tracking-[0.16em] text-cloud/42">{label}</span>
+                    <span className="text-xs font-bold uppercase tracking-[0.16em] text-cloud/66">{label}</span>
                     <strong className="text-sm text-white">{value}</strong>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink/10">
                     <div
                       className="h-full rounded-full bg-calm-line transition-all duration-500"
                       style={{ width: metricPercent(percent) }}
@@ -191,7 +191,7 @@ export default function CameraWellbeingPanel({
             className="secondary-button mt-4 min-h-11 w-full text-sm focus-ring disabled:cursor-not-allowed disabled:opacity-45"
           >
             {aiBusy ? <Loader2 className="animate-spin" size={18} /> : <Sparkles size={18} />}
-            {language === 'ru' ? 'AI-рекомендация' : 'AI кеңес алу'}
+            {language === 'ru' ? 'ЖИ кеңес алу' : 'ЖИ кеңес алу'}
           </button>
         </div>
       </div>

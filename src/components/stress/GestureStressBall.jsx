@@ -9,7 +9,7 @@ const gestureText = {
     title: 'Қолмен антистресс шар',
     subtitle: 'Жұмсақ шар қол қимылына қарай созылып, қысылады.',
     camera: 'Камера',
-    pointer: 'Тач / mouse',
+    pointer: 'Сенсор / тінтуір',
     active: 'қол табылды',
     idle: 'қол күтілуде',
     squeeze: 'қысым',
@@ -19,7 +19,7 @@ const gestureText = {
     title: 'Антистресс-шар руками',
     subtitle: 'Мягкий шар растягивается и сжимается от движения руки.',
     camera: 'Камера',
-    pointer: 'Тач / mouse',
+    pointer: 'Сенсор / тінтуір',
     active: 'рука найдена',
     idle: 'рука ожидается',
     squeeze: 'сжатие',
@@ -76,12 +76,12 @@ export default function GestureStressBall() {
   };
 
   return (
-    <section className="glass-panel rounded-[1.75rem] p-4 sm:p-6">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+    <section className="premium-card rounded-[1.9rem] p-4 sm:p-6">
+      <div className="relative z-10 mb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-aqua/78">Gesture game</p>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-aqua/78">Қимыл ойыны</p>
           <h2 className="mt-2 font-display text-2xl font-extrabold text-white">{copy.title}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-cloud/62">{copy.subtitle}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-cloud/78">{copy.subtitle}</p>
         </div>
         <button
           type="button"
@@ -106,9 +106,9 @@ export default function GestureStressBall() {
         </button>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1fr_22rem]">
+      <div className="relative z-10 grid gap-5 xl:grid-cols-[1fr_22rem]">
         <div
-          className="relative min-h-[390px] touch-none overflow-hidden rounded-[1.4rem] border border-white/12 bg-[linear-gradient(145deg,rgba(255,255,255,.09),rgba(135,196,163,.08),rgba(124,109,242,.08))]"
+          className="relative min-h-[390px] touch-none overflow-hidden rounded-[1.4rem] border border-ink/12 bg-[linear-gradient(145deg,rgba(255,255,255,.09),rgba(85,221,224,.07),rgba(124,109,242,.09))] shadow-[inset_0_1px_0_rgba(255,255,255,.06)]"
           onPointerDown={updatePointer}
           onPointerMove={updatePointer}
           onPointerUp={releasePointer}
@@ -125,7 +125,7 @@ export default function GestureStressBall() {
               style={orbStyle}
             />
             <span
-              className="absolute h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/45 bg-white/10 shadow-[0_0_34px_rgba(245,248,255,.28)] transition-all duration-150"
+              className="absolute h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border border-ink/45 bg-ink/10 shadow-[0_0_34px_rgba(245,248,255,.28)] transition-all duration-150"
               style={{ left: `${x * 100}%`, top: `${y * 100}%`, opacity: active ? 1 : 0.28 }}
             />
           </div>
@@ -137,7 +137,7 @@ export default function GestureStressBall() {
             </StatusPill>
           </div>
 
-          <div className="absolute bottom-4 left-4 right-4 h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="absolute bottom-4 left-4 right-4 h-2 overflow-hidden rounded-full bg-ink/10">
             <div
               className="h-full rounded-full bg-calm-line transition-all duration-200"
               style={{ width: `${Math.round((0.18 + squeeze * 0.82) * 100)}%` }}
@@ -146,7 +146,7 @@ export default function GestureStressBall() {
         </div>
 
         <aside className="grid gap-4">
-          <div className="relative min-h-[210px] overflow-hidden rounded-[1.25rem] border border-white/12 bg-ink/48">
+          <div className="relative min-h-[210px] overflow-hidden rounded-[1.25rem] border border-ink/12 bg-ink/48">
             <video
               ref={camera.videoRef}
               className={camera.active ? 'h-full min-h-[210px] w-full scale-x-[-1] object-cover opacity-80' : 'hidden'}
@@ -157,21 +157,21 @@ export default function GestureStressBall() {
             {!camera.active ? (
               <div className="absolute inset-0 grid place-items-center px-6 text-center">
                 <Hand className="mx-auto text-aqua" size={34} />
-                <p className="mt-3 text-sm leading-7 text-cloud/62">
-                  {camera.supported ? copy.camera : 'Camera unavailable'}
+                <p className="mt-3 text-sm leading-7 text-cloud/78">
+                  {camera.supported ? copy.camera : 'Камера қолжетімсіз'}
                 </p>
               </div>
             ) : null}
           </div>
 
-          <div className="grid gap-3 rounded-[1.25rem] border border-white/12 bg-white/7 p-4">
+          <div className="grid gap-3 rounded-[1.25rem] border border-ink/12 bg-ink/7 p-4">
             {[
               [copy.pointer, <MousePointer2 key="pointer" size={19} />],
               [copy.camera, <Camera key="camera" size={19} />],
-              ['AI gesture', <Sparkles key="sparkles" size={19} />],
+              ['ЖИ қимылы', <Sparkles key="sparkles" size={19} />],
             ].map(([label, icon]) => (
-              <div key={label} className="flex items-center justify-between rounded-2xl border border-white/10 bg-ink/28 px-4 py-3">
-                <span className="text-sm font-bold text-cloud/72">{label}</span>
+              <div key={label} className="flex items-center justify-between rounded-2xl border border-ink/10 bg-ink/28 px-4 py-3">
+                <span className="text-sm font-bold text-cloud/82">{label}</span>
                 <span className="text-aqua">{icon}</span>
               </div>
             ))}

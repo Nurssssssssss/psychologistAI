@@ -9,7 +9,7 @@ export default function StatusPill({ color = 'aqua', children }) {
   return (
     <span
       className={[
-        'inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold',
+        'inline-flex items-center rounded-full border px-3 py-1 text-xs font-extrabold tracking-[0.03em] shadow-[0_12px_34px_rgba(0,0,0,.16)] backdrop-blur-xl',
         colorMap[color] ?? colorMap.aqua,
       ].join(' ')}
     >

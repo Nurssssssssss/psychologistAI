@@ -1,15 +1,22 @@
+import { motion } from 'framer-motion';
+
 export default function SectionHeader({ eyebrow, title, children, align = 'left' }) {
   const centered = align === 'center';
 
   return (
-    <div className={centered ? 'mx-auto max-w-3xl text-center' : 'max-w-3xl'}>
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      className={centered ? 'mx-auto max-w-4xl text-center' : 'max-w-4xl'}
+    >
       {eyebrow ? (
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-aqua/82">{eyebrow}</p>
+        <p className="eyebrow-chip mb-4">{eyebrow}</p>
       ) : null}
-      <h1 className="font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
+      <h1 className="text-balance font-display text-4xl font-extrabold leading-[1.03] text-white sm:text-5xl lg:text-6xl">
         {title}
       </h1>
-      {children ? <div className="mt-4 text-base leading-8 text-cloud/68 sm:text-lg">{children}</div> : null}
-    </div>
+      {children ? <div className="mt-5 text-base leading-8 text-cloud/82 sm:text-lg">{children}</div> : null}
+    </motion.div>
   );
 }

@@ -154,15 +154,15 @@ export function useVoiceRecorder({ language = 'kk-KZ' } = {}) {
       statusRef.current = 'recording';
       setStatus('recording');
       return true;
-    } catch (startError) {
+    } catch {
       cleanupAudio();
       stopRecognition();
       statusRef.current = 'idle';
       setStatus('idle');
-      setError(startError?.message || 'microphone_unavailable');
+      setError(language === 'ru' ? 'Микрофонға рұқсат берілмеді.' : 'Микрофонға рұқсат берілмеді.');
       return false;
     }
-  }, [cleanupAudio, connectLevelMeter, startRecognition, setTranscript, stopRecognition, supported]);
+  }, [cleanupAudio, connectLevelMeter, language, startRecognition, setTranscript, stopRecognition, supported]);
 
   const stop = useCallback(() => {
     stopRecognition();

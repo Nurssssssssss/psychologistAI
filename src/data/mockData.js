@@ -14,7 +14,7 @@ import {
 export const modules = [
   {
     title: 'Дауыстық қарым-қатынас',
-    description: 'Мұғалім дауыспен сөйлейді, AI қысқа әрі жылы жауап беріп, қажет болса оны дыбыстайды.',
+    description: 'Мұғалім дауыспен сөйлейді, ЖИ қысқа әрі жылы жауап беріп, қажет болса оны дыбыстайды.',
     icon: Mic2,
     to: '/voice',
     tone: 'cyan',
@@ -28,14 +28,14 @@ export const modules = [
   },
   {
     title: 'Күй-жағдайды талдау',
-    description: 'Жылдам self-check арқылы шаршау, күйзеліс және тыныштық деңгейін көру.',
+    description: 'Жылдам өзін-өзі тексеру арқылы шаршау, күйзеліс және тыныштық деңгейін көру.',
     icon: Brain,
     to: '/mood',
     tone: 'violet',
   },
   {
     title: 'Антистресс модульдері',
-    description: '1 минуттық тыныс алу, gesture stress ball және жылдам тыныштану құралдары.',
+    description: '1 минуттық тыныс алу, қолмен басқарылатын жұмсақ шар және жылдам тыныштану құралдары.',
     icon: HeartPulse,
     to: '/anti-stress',
     tone: 'green',
@@ -48,8 +48,8 @@ export const modules = [
     tone: 'peach',
   },
   {
-    title: '3D интерфейс',
-    description: 'Эмоциялық core дауысқа, күйге және AI жауабына қарай жұмсақ қозғалады.',
+    title: 'Үш өлшемді интерфейс',
+    description: 'Эмоциялық өзек дауысқа, күйге және ЖИ жауабына қарай жұмсақ қозғалады.',
     icon: Orbit,
     to: '/',
     tone: 'iris',
@@ -102,19 +102,19 @@ export const moodOptions = [
 export const antiStressCards = [
   {
     title: '1 минут тыныс алу',
-    description: 'Көзді демалдырып, тыныс ырғағын баяулататын guided practice.',
+    description: 'Көзді демалдырып, тыныс ырғағын баяулататын бағытталған жаттығу.',
     icon: Waves,
     state: 'calming',
   },
   {
     title: 'Жылдам тыныштану',
-    description: 'Сабақ арасындағы қысқа grounding жаттығуы: дене, тыныс, назар.',
+    description: 'Сабақ арасындағы қысқа орнығу жаттығуы: дене, тыныс, назар.',
     icon: Activity,
     state: 'idle',
   },
   {
     title: 'Дауыспен қолдау',
-    description: 'AI-мен жұмсақ сөйлесіп, ауыр ойды сөзге айналдыру.',
+    description: 'ЖИ-мен жұмсақ сөйлесіп, ауыр ойды сөзге айналдыру.',
     icon: Sparkles,
     state: 'speaking',
   },
@@ -129,7 +129,7 @@ export const antiStressCards = [
 export const diaryEmotions = [
   { key: 'joy', label: 'қуаныш', color: '#55DDE0', value: 82 },
   { key: 'tired', label: 'шаршау', color: '#8EC5FF', value: 46 },
-  { key: 'stress', label: 'стресс', color: '#F0B38A', value: 34 },
+  { key: 'stress', label: 'күйзеліс', color: '#F0B38A', value: 34 },
   { key: 'peace', label: 'тыныштық', color: '#87C4A3', value: 76 },
   { key: 'worry', label: 'алаңдау', color: '#7C6DF2', value: 40 },
 ];

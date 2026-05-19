@@ -5,7 +5,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Manrope', 'Inter', 'ui-sans-serif', 'system-ui'],
+        display: ['Plus Jakarta Sans', 'Manrope', 'Inter', 'ui-sans-serif', 'system-ui'],
       },
       colors: {
         ink: '#0B1020',

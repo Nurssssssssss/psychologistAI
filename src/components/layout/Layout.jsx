@@ -1,16 +1,20 @@
 import Navbar from './Navbar.jsx';
+import AmbientBackground from '../shared/AmbientBackground.jsx';
+import CursorAura from '../shared/CursorAura.jsx';
 
 export default function Layout({ children }) {
   return (
     <div className="app-shell min-h-screen overflow-hidden text-cloud">
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-28 border-b border-white/10 bg-ink/45 backdrop-blur-xl" />
+      <AmbientBackground />
+      <CursorAura />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-[1] h-32 border-b border-ink/8 bg-ink/20 backdrop-blur-2xl" />
       <div className="relative z-10 flex min-h-screen flex-col">
         <Navbar />
-        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-14 pt-5 sm:px-6 lg:px-8">
+        <main className="mx-auto flex w-full max-w-[90rem] flex-1 flex-col px-4 pb-16 pt-5 sm:px-6 lg:px-8">
           {children}
         </main>
-        <footer className="relative z-10 border-t border-white/10 px-4 py-6 text-center text-sm text-cloud/52">
-          Teacher Support AI / Ұстазға көмек AI - emotional wellbeing product for teachers
+        <footer className="relative z-10 border-t border-ink/10 px-4 py-7 text-center text-sm text-cloud/70 backdrop-blur-xl">
+          Ұстазға көмек ЖИ - мұғалімдерге арналған эмоциялық қолдау платформасы
         </footer>
       </div>
     </div>
