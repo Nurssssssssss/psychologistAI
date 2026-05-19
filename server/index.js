@@ -41,10 +41,9 @@ app.use(express.json({ limit: '1mb' }));
 
 function systemInstructions(locale = 'kk', mode = 'support') {
   const language = locale === 'ru' ? 'Russian' : 'Kazakh';
-  const noEnglish =
-    locale === 'kk'
-      ? 'User-facing replies must be fully in Kazakh. Do not use English words; write "ЖИ" instead of "AI".'
-      : 'User-facing replies must not contain English words; write "ЖИ" instead of "AI".';
+const noEnglish = locale === 'kk'
+  ? 'User-facing replies must be fully in Kazakh. Do not use English or Russian words. Write "ЖИ" instead of "AI".'
+  : 'User-facing replies must not contain English words; write "ЖИ" instead of "AI".';
   const modeHint = {
     support:
       'General module: listen first, reflect briefly, then suggest one gentle next step.',
