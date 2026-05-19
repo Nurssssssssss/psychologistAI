@@ -11,6 +11,7 @@ AI-платформа эмоциональной поддержки учител
 - Three.js + React Three Fiber + Drei
 - Lucide React icons
 - Web Speech API и Web Audio API для voice UI
+- OpenAI TTS для естественного озвучивания ответов ЖИ
 
 ## Быстрый запуск
 
@@ -102,6 +103,7 @@ Vite proxy уже настроен на `http://localhost:8787`, поэтому 
 ```text
 POST /api/chat
 POST /api/speech-to-text
+POST /api/text-to-speech
 ```
 
 Ожидаемый контракт для `/api/chat`:
@@ -139,6 +141,16 @@ GOOGLE_API_KEY
 GOOGLE_GENERATIVE_AI_API_KEY
 GOOGLE_GEMINI_API_KEY
 ```
+
+Для качественного озвучивания ответов с управляемой казахской интонацией добавьте:
+
+```text
+OPENAI_API_KEY=ваш OpenAI key
+OPENAI_TTS_MODEL=gpt-4o-mini-tts
+OPENAI_TTS_VOICE=marin
+```
+
+Если `OPENAI_API_KEY` не задан, чат всё равно работает и пробует браузерное озвучивание как запасной вариант, но акцент зависит от устройства пользователя.
 
 После деплоя проверьте:
 

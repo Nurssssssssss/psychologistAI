@@ -28,6 +28,8 @@ const geminiApiBaseUrl = (process.env.GEMINI_API_BASE_URL || 'https://generative
 );
 const openaiModel = process.env.OPENAI_MODEL || 'gpt-5-mini';
 const transcribeModel = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-mini-transcribe';
+const ttsModel = process.env.OPENAI_TTS_MODEL || 'gpt-4o-mini-tts';
+const ttsVoice = process.env.OPENAI_TTS_VOICE || 'marin';
 const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const activeProvider = geminiApiKey ? 'gemini' : openai ? 'openai' : 'mock';
@@ -185,6 +187,27 @@ function missingProviderMessage(locale = 'kk') {
   return 'ЖИ қызметі қосылмаған: серверге құпия кілт енгізіп, қызметті қайта іске қосыңыз.';
 }
 
+function cleanTextForSpeech(text = '') {
+  return String(text).replace(/\s+/g, ' ').trim().slice(0, 2600);
+}
+
+function speechInstructions(locale = 'kk') {
+  if (locale === 'ru') {
+    return [
+      'Read the text naturally and calmly as an AI support assistant for a school teacher.',
+      'Use warm Central Asian Kazakh intonation, clear diction, and a soft supportive pace.',
+      'Do not sound theatrical, robotic, or rushed.',
+    ].join(' ');
+  }
+
+  return [
+    'Read the Kazakh text as a native Kazakh speaker from Kazakhstan.',
+    'Use natural Kazakh pronunciation, rhythm, and intonation with no Russian accent.',
+    'Keep a warm, calm psychologist-assistant tone for a tired school teacher.',
+    'Speak clearly and gently, as if the written answer was meant to be heard aloud.',
+  ].join(' ');
+}
+
 function mockCameraAdvice(locale = 'kk', state = 'calm') {
   const kk = {
     calm:
@@ -219,6 +242,9 @@ app.get('/api/health', (_request, response) => {
     acceptedGeminiKeyEnv: geminiApiKeyNames,
     openai: Boolean(openai),
     model: activeModel,
+    tts: Boolean(openai),
+    ttsModel: openai ? ttsModel : null,
+    ttsVoice: openai ? ttsVoice : null,
     staticBuild: hasStaticBuild,
   });
 });
@@ -275,6 +301,43 @@ app.post('/api/chat', async (request, response) => {
       message: locale === 'ru' ? 'Gemini сейчас не смог ответить. Проверьте backend logs на Render.' : 'Gemini қазір жауап бере алмады. Render backend logs тексеріңіз.',
       source: 'error',
     });
+  }
+});
+
+app.post('/api/text-to-speech', async (request, response) => {
+  const locale = request.body?.locale === 'ru' ? 'ru' : 'kk';
+  const input = cleanTextForSpeech(request.body?.text);
+
+  if (!input) {
+    return response.status(400).json({ error: 'text is required' });
+  }
+
+  if (!openai) {
+    return response.status(503).json({
+      error: 'tts_provider_missing',
+      message: 'OPENAI_API_KEY is required for high-quality Kazakh text-to-speech.',
+      source: 'error',
+    });
+  }
+
+  try {
+    const audio = await openai.audio.speech.create({
+      model: ttsModel,
+      voice: ttsVoice,
+      input,
+      instructions: speechInstructions(locale),
+      response_format: 'mp3',
+    });
+    const audioBuffer = Buffer.from(await audio.arrayBuffer());
+
+    response.setHeader('Content-Type', 'audio/mpeg');
+    response.setHeader('Cache-Control', 'no-store');
+    response.setHeader('X-TTS-Model', ttsModel);
+    response.setHeader('X-TTS-Voice', ttsVoice);
+    return response.send(audioBuffer);
+  } catch (error) {
+    console.error('openai tts error:', error);
+    return response.status(500).json({ error: 'openai_tts_failed' });
   }
 });
 

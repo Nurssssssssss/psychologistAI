@@ -1,9 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bot, Send, UserRound } from 'lucide-react';
+import { Bot, Send, UserRound, Volume2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 
-export default function ChatPanel({ messages, input, setInput, onSend, busy = false }) {
+export default function ChatPanel({
+  messages,
+  input,
+  setInput,
+  onSend,
+  onSpeak,
+  speechEnabled = true,
+  busy = false,
+}) {
   const { t } = useLanguage();
   const bottomRef = useRef(null);
 
@@ -38,7 +46,18 @@ export default function ChatPanel({ messages, input, setInput, onSend, busy = fa
                       : 'border border-ink/12 bg-ink/8 text-cloud/86 shadow-[0_18px_44px_rgba(0,0,0,.15)]',
                   ].join(' ')}
                 >
-                  {message.content}
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  {!isUser && onSpeak && speechEnabled ? (
+                    <button
+                      type="button"
+                      onClick={() => onSpeak(message.content)}
+                      className="icon-button mt-3 h-8 w-8 border-aqua/20 bg-aqua/8 text-aqua focus-ring"
+                      aria-label={t('voice.replay')}
+                      title={t('voice.replay')}
+                    >
+                      <Volume2 size={15} />
+                    </button>
+                  ) : null}
                 </div>
                 {isUser ? (
                   <span className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink/18 bg-ink/10 text-white">

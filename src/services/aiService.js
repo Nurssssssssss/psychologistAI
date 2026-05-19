@@ -66,6 +66,28 @@ export async function sendVoiceTranscript({ transcript, history = [], locale = '
   });
 }
 
+export async function synthesizeSpeech({ text, locale = 'kk' }) {
+  const cleanText = text.trim();
+  if (!cleanText) {
+    throw new Error('speech text is empty');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/text-to-speech`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text: cleanText,
+      locale,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`speech synthesis returned ${response.status}`);
+  }
+
+  return response.blob();
+}
+
 export async function requestCameraAdvice({ signals, locale = 'kk', context = '' }) {
   const face = signals?.face ?? {};
   const fallback =

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { BrainCircuit, Mic, MicOff, Radio, Sparkles, Volume2, Waves } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ChatPanel from '../components/voice/ChatPanel.jsx';
 import VoiceLevelBars from '../components/voice/VoiceLevelBars.jsx';
 import PageTransition from '../components/shared/PageTransition.jsx';
@@ -11,7 +11,7 @@ import EmotionalCore from '../components/three/EmotionalCore.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { chatSeed } from '../data/mockData.js';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder.js';
-import { sendChatMessage, sendVoiceTranscript, transcribeAudio } from '../services/aiService.js';
+import { sendChatMessage, sendVoiceTranscript, synthesizeSpeech, transcribeAudio } from '../services/aiService.js';
 
 const quickPrompts = [
   'Бүгін қатты шаршадым, бірақ сабаққа дайындалуым керек.',
@@ -32,10 +32,32 @@ export default function VoiceSupport() {
   const [voiceState, setVoiceState] = useState('idle');
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const [busy, setBusy] = useState(false);
+  const audioRef = useRef(null);
+  const audioUrlRef = useRef('');
+  const speechRunRef = useRef(0);
   const recorder = useVoiceRecorder({
     language: language === 'kk' ? 'kk-KZ' : 'ru-RU',
   });
   const cancelRecording = recorder.cancel;
+
+  const releaseServerAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+      audioRef.current = null;
+    }
+
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = '';
+    }
+  }, []);
+
+  const stopSpeech = useCallback(() => {
+    speechRunRef.current += 1;
+    releaseServerAudio();
+    window.speechSynthesis?.cancel();
+  }, [releaseServerAudio]);
 
   useEffect(() => {
     if (recorder.recording) {
@@ -51,9 +73,9 @@ export default function VoiceSupport() {
   useEffect(() => {
     return () => {
       cancelRecording();
-      window.speechSynthesis?.cancel();
+      stopSpeech();
     };
-  }, [cancelRecording]);
+  }, [cancelRecording, stopSpeech]);
 
   const statusText = useMemo(() => {
     if (voiceState === 'listening') return t('voice.listening');
@@ -73,10 +95,12 @@ export default function VoiceSupport() {
           ? 0.34
           : 0.12;
 
-  const speak = useCallback(
-    (text) => {
-      if (!ttsEnabled || !window.speechSynthesis) {
-        window.setTimeout(() => setVoiceState('idle'), 1200);
+  const speakWithBrowserVoice = useCallback(
+    (text, speechId) => {
+      if (!window.speechSynthesis) {
+        window.setTimeout(() => {
+          if (speechRunRef.current === speechId) setVoiceState('idle');
+        }, 1200);
         return;
       }
 
@@ -86,15 +110,66 @@ export default function VoiceSupport() {
       utterance.rate = 0.92;
       utterance.pitch = 1.02;
       const voices = window.speechSynthesis.getVoices?.() ?? [];
-      const preferredVoice = voices.find((voice) =>
-        voice.lang.toLowerCase().startsWith(language === 'kk' ? 'kk' : 'ru'),
-      );
+      const targetLanguage = language === 'kk' ? 'kk' : 'ru';
+      const preferredVoice = voices.find((voice) => voice.lang.toLowerCase().startsWith(targetLanguage));
       if (preferredVoice) utterance.voice = preferredVoice;
-      utterance.onend = () => setVoiceState('idle');
-      utterance.onerror = () => setVoiceState('idle');
+      utterance.onend = () => {
+        if (speechRunRef.current === speechId) setVoiceState('idle');
+      };
+      utterance.onerror = () => {
+        if (speechRunRef.current === speechId) setVoiceState('idle');
+      };
       window.speechSynthesis.speak(utterance);
     },
-    [language, ttsEnabled],
+    [language],
+  );
+
+  const speak = useCallback(
+    async (text) => {
+      const cleanText = text.trim();
+      if (!cleanText || !ttsEnabled) {
+        setVoiceState('idle');
+        return;
+      }
+
+      const speechId = speechRunRef.current + 1;
+      speechRunRef.current = speechId;
+      setVoiceState('speaking');
+      releaseServerAudio();
+      window.speechSynthesis?.cancel();
+
+      try {
+        const audioBlob = await synthesizeSpeech({ text: cleanText, locale: language });
+        if (speechRunRef.current !== speechId) return;
+
+        const audioUrl = URL.createObjectURL(audioBlob);
+        audioUrlRef.current = audioUrl;
+        const audio = new Audio(audioUrl);
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          if (speechRunRef.current === speechId) {
+            releaseServerAudio();
+            setVoiceState('idle');
+          }
+        };
+        audio.onerror = () => {
+          if (speechRunRef.current === speechId) {
+            releaseServerAudio();
+            speakWithBrowserVoice(cleanText, speechId);
+          }
+        };
+
+        await audio.play();
+      } catch (error) {
+        console.info('Server TTS fallback:', error.message);
+        if (speechRunRef.current === speechId) {
+          releaseServerAudio();
+          speakWithBrowserVoice(cleanText, speechId);
+        }
+      }
+    },
+    [language, releaseServerAudio, speakWithBrowserVoice, ttsEnabled],
   );
 
   const handleSend = useCallback(
@@ -102,6 +177,7 @@ export default function VoiceSupport() {
       const nextMessage = rawMessage.trim();
       if (!nextMessage || busy) return;
 
+      stopSpeech();
       const userMessage = { role: 'user', content: nextMessage };
       const nextHistory = [...messages, userMessage];
       setMessages(nextHistory);
@@ -116,9 +192,9 @@ export default function VoiceSupport() {
       setMessages((current) => [...current, reply]);
       setBusy(false);
       setVoiceState('speaking');
-      speak(reply.content);
+      void speak(reply.content);
     },
-    [busy, language, messages, speak],
+    [busy, language, messages, speak, stopSpeech],
   );
 
   const toggleListening = async () => {
@@ -150,7 +226,7 @@ export default function VoiceSupport() {
       return;
     }
 
-    window.speechSynthesis?.cancel();
+    stopSpeech();
     setInput('');
     const started = await recorder.start();
     if (!started) setVoiceState('idle');
@@ -194,16 +270,26 @@ export default function VoiceSupport() {
             <StatusPill color={voiceState === 'listening' ? 'aqua' : voiceState === 'speaking' ? 'peach' : 'iris'}>
               {statusText}
             </StatusPill>
-            <label className="flex cursor-pointer items-center gap-3 rounded-full border border-ink/12 bg-ink/8 px-4 py-2 text-sm font-semibold text-cloud/82">
-              <Volume2 size={17} className="text-aqua" />
-              <span>{t('voice.tts')}</span>
-              <input
-                type="checkbox"
-                checked={ttsEnabled}
-                onChange={(event) => setTtsEnabled(event.target.checked)}
-                className="h-4 w-4 accent-aqua"
-              />
-            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="flex cursor-pointer items-center gap-3 rounded-full border border-ink/12 bg-ink/8 px-4 py-2 text-sm font-semibold text-cloud/82">
+                <Volume2 size={17} className="text-aqua" />
+                <span>{t('voice.tts')}</span>
+                <input
+                  type="checkbox"
+                  checked={ttsEnabled}
+                  onChange={(event) => {
+                    const nextEnabled = event.target.checked;
+                    setTtsEnabled(nextEnabled);
+                    if (!nextEnabled) {
+                      stopSpeech();
+                      setVoiceState('idle');
+                    }
+                  }}
+                  className="h-4 w-4 accent-aqua"
+                />
+              </label>
+              <p className="text-xs font-semibold text-cloud/54">{t('voice.ttsDisclosure')}</p>
+            </div>
           </div>
 
           <div className="relative z-10">
@@ -263,7 +349,15 @@ export default function VoiceSupport() {
             </div>
             <Radio className="text-aqua" size={21} />
           </div>
-          <ChatPanel messages={messages} input={input} setInput={setInput} onSend={handleSend} busy={busy} />
+          <ChatPanel
+            messages={messages}
+            input={input}
+            setInput={setInput}
+            onSend={handleSend}
+            onSpeak={speak}
+            speechEnabled={ttsEnabled}
+            busy={busy}
+          />
         </PremiumCard>
       </div>
     </PageTransition>
